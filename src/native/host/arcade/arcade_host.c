@@ -385,6 +385,11 @@ void arcade_host_task(void)
 
     buttons = map_arcade_to_joypad(pad);
     hotkeys_check(buttons, 0);
+    // Only submit if state changed
+    if (buttons == prev_buttons[0]) {
+        return;
+    }
+    prev_buttons[0] = buttons;
     // =================================================================
     // Apply d-pad mode (remap d-pad to analog stick if needed)
     // =================================================================
@@ -406,12 +411,6 @@ void arcade_host_task(void)
             analog_2y = ay;
         }
     }
-
-    // Only submit if state changed
-    if (buttons == prev_buttons[0]) {
-        return;
-    }
-    prev_buttons[0] = buttons;
 
     // Build input event
     input_event_t event;
