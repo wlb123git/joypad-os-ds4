@@ -77,6 +77,8 @@ CONSOLE_usb_rp2040zero := joypad_usb_rp2040zero
 CONSOLE_usb_rp2350usba := joypad_usb_rp2350usba
 CONSOLE_bt2usb := joypad_bt2usb
 CONSOLE_bt2nuon := joypad_bt2nuon
+CONSOLE_bt2n64 := joypad_bt2n64
+CONSOLE_n64 := joypad_n64
 CONSOLE_wifi2usb := joypad_wifi2usb
 CONSOLE_snes2usb := joypad_snes2usb
 CONSOLE_n642usb := joypad_n642usb
@@ -115,6 +117,9 @@ APP_bt2usb_pico_w := pico_w bt2usb bt2usb_pico_w Bluetooth USB
 APP_bt2usb_pico2_w := pico2_w bt2usb bt2usb_pico2_w Bluetooth USB
 APP_bt2nuon_pico_w := pico_w bt2nuon bt2nuon_pico_w Bluetooth Nuon
 APP_bt2nuon_pico2_w := pico2_w bt2nuon bt2nuon_pico2_w Bluetooth Nuon
+APP_bt2n64_pico_w := pico_w bt2n64 bt2n64_pico_w Bluetooth N64
+APP_bt2n64_pico2_w := pico2_w bt2n64 bt2n64_pico2_w Bluetooth N64
+APP_usb2n64_kb2040 := kb2040 n64 usb2n64_kb2040 USB/BT N64
 APP_wifi2usb_pico_w := pico_w wifi2usb wifi2usb_pico_w WiFi USB
 APP_wifi2usb_pico2_w := pico2_w wifi2usb wifi2usb_pico2_w WiFi USB
 APP_snes2usb_kb2040 := kb2040 snes2usb snes2usb_kb2040 SNES USB
@@ -129,7 +134,7 @@ APP_controller_macropad := macropad controller_macropad controller_macropad GPIO
 
 # All apps (note: controller_macropad not included - build explicitly with 'make controller_macropad')
 # Note: usb2loopy_kb2040, snes23do_rp2040zero excluded until more mature
-APPS := usb2pce_kb2040 usb2gc_kb2040 usb2gc_rp2040zero usb2nuon_kb2040 usb2dc_kb2040 usb2dc_rp2040zero usb2neogeo_kb2040 usb2neogeo_pico usb2neogeo_rp2040zero n642dc_kb2040 n642nuon_kb2040 usb23do_rp2040zero usb2uart_kb2040 usb2usb_pico usb2usb_pico_w usb2usb_pico2_w usb2usb_feather usb2usb_rp2040zero usb2usb_rp2350usba bt2usb_pico_w bt2usb_pico2_w bt2nuon_pico_w bt2nuon_pico2_w snes2usb_kb2040 n642usb_kb2040 gc2usb_kb2040 controller_fisherprice_kb2040 controller_alpakka_pico
+APPS := usb2pce_kb2040 usb2gc_kb2040 usb2gc_rp2040zero usb2nuon_kb2040 usb2n64_kb2040 usb2dc_kb2040 usb2dc_rp2040zero usb2neogeo_kb2040 usb2neogeo_pico usb2neogeo_rp2040zero n642dc_kb2040 n642nuon_kb2040 usb23do_rp2040zero usb2uart_kb2040 usb2usb_pico usb2usb_pico_w usb2usb_pico2_w usb2usb_feather usb2usb_rp2040zero usb2usb_rp2350usba bt2usb_pico_w bt2usb_pico2_w bt2nuon_pico_w bt2nuon_pico2_w bt2n64_pico_w bt2n64_pico2_w snes2usb_kb2040 n642usb_kb2040 gc2usb_kb2040 controller_fisherprice_kb2040 controller_alpakka_pico
 
 # Stable apps for release
 # Note: usb2loopy_kb2040, snes23do_rp2040zero excluded until more mature
@@ -172,6 +177,7 @@ help:
 	@echo "  make usb2gc_kb2040      - USB/BT -> GameCube (KB2040)"
 	@echo "  make usb2gc_rp2040zero  - USB/BT -> GameCube (RP2040-Zero)"
 	@echo "  make usb2nuon_kb2040    - USB/BT -> Nuon (KB2040)"
+	@echo "  make usb2n64_kb2040     - USB/BT -> N64 (KB2040)"
 	@echo "  make usb2loopy_kb2040   - USB/BT -> Loopy (KB2040)"
 	@echo "  make usb2dc_kb2040      - USB/BT -> Dreamcast (KB2040)"
 	@echo "  make usb2dc_rp2040zero  - USB/BT -> Dreamcast (RP2040-Zero, USB4Maple-compatible)"
@@ -194,6 +200,7 @@ help:
 	@echo "  make uf2-bt2usb_esp32s3       - Build + generate .uf2 for drag-and-drop update"
 	@echo "  make flash-uf2-bt2usb_esp32s3 - Build + flash .uf2 via TinyUF2 drive"
 	@echo "  make bt2nuon_pico_w     - Bluetooth -> Nuon (Pico W)"
+	@echo "  make bt2n64_pico_w      - Bluetooth -> N64 (Pico W)"
 	@echo "  make wifi2usb_pico_w    - WiFi -> USB HID (Pico W)"
 	@echo "  make snes2usb_kb2040    - SNES -> USB HID (KB2040)"
 	@echo "  make n642usb_kb2040     - N64 -> USB HID (KB2040)"
@@ -300,6 +307,10 @@ usb2gc_rp2040zero:
 usb2nuon_kb2040:
 	$(call build_app,usb2nuon_kb2040)
 
+.PHONY: usb2n64_kb2040
+usb2n64_kb2040:
+	$(call build_app,usb2n64_kb2040)
+
 .PHONY: usb2loopy_kb2040
 usb2loopy_kb2040:
 	$(call build_app,usb2loopy_kb2040)
@@ -383,6 +394,14 @@ bt2nuon_pico_w:
 .PHONY: bt2nuon_pico2_w
 bt2nuon_pico2_w:
 	$(call build_app,bt2nuon_pico2_w)
+
+.PHONY: bt2n64_pico_w
+bt2n64_pico_w:
+	$(call build_app,bt2n64_pico_w)
+
+.PHONY: bt2n64_pico2_w
+bt2n64_pico2_w:
+	$(call build_app,bt2n64_pico2_w)
 
 # --- ESP32-S3 bt2usb (requires ESP-IDF) ---
 .PHONY: bt2usb_esp32s3
@@ -680,6 +699,18 @@ flash-bt2nuon_pico_w:
 .PHONY: flash-bt2nuon_pico2_w
 flash-bt2nuon_pico2_w:
 	@$(MAKE) --no-print-directory _flash_app APP_NAME=bt2nuon_pico2_w
+
+.PHONY: flash-bt2n64_pico_w
+flash-bt2n64_pico_w:
+	@$(MAKE) --no-print-directory _flash_app APP_NAME=bt2n64_pico_w
+
+.PHONY: flash-bt2n64_pico2_w
+flash-bt2n64_pico2_w:
+	@$(MAKE) --no-print-directory _flash_app APP_NAME=bt2n64_pico2_w
+
+.PHONY: flash-usb2n64_kb2040
+flash-usb2n64_kb2040:
+	@$(MAKE) --no-print-directory _flash_app APP_NAME=usb2n64_kb2040
 
 .PHONY: flash-wifi2usb_pico_w
 flash-wifi2usb_pico_w:
