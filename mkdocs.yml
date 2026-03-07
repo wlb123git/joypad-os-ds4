@@ -32,27 +32,36 @@ theme:
 nav:
   - Home: index.md
   - Getting Started:
-    - Installation: INSTALLATION.md
-    - Building: BUILD.md
-    - Hardware Compatibility: HARDWARE.md
-  - Firmware Apps:
-    - USB2USB: apps/USB2USB.md
-    - BT2USB: apps/BT2USB.md
-    - USB2GC (GameCube / Wii): apps/USB2GC.md
-    - USB23DO (3DO): apps/USB23DO.md
-    - USB2DC (Dreamcast): apps/USB2DC.md
-    - USB2Neo (Neo Geo): apps/USB2NEO.md
-    - USB2Nuon (Nuon): apps/USB2NUON.md
-    - USB2PCE (PC Engine): apps/USB2PCE.md
-    - USB2Loopy (Casio Loopy): apps/USB2LOOPY.md
-  - Features:
-    - SNES Rumble: features/SNES_RUMBLE.md
+    - Installation: getting-started/installation.md
+    - Building from Source: getting-started/building.md
+  - Adapters:
+    - PC Engine / TurboGrafx-16: adapters/pcengine.md
+    - GameCube / Wii: adapters/gamecube.md
+    - Dreamcast: adapters/dreamcast.md
+    - Nuon: adapters/nuon.md
+    - 3DO: adapters/3do.md
+    - Neo Geo / SuperGun: adapters/neogeo.md
+    - Casio Loopy: adapters/loopy.md
+    - USB Output: adapters/usb.md
+    - Bluetooth: adapters/bluetooth.md
+    - Native Input: adapters/native-input.md
+  - Hardware:
+    - Supported Controllers: hardware/controllers.md
+    - Supported Boards: hardware/boards.md
+    - Wiring Guide: hardware/wiring.md
+    - DIY Builds: hardware/diy.md
+  - Platforms:
+    - ESP32-S3: platforms/esp32.md
+    - nRF52840: platforms/nrf52840.md
+  - Architecture:
+    - How It Works: architecture/overview.md
   - Protocol Reference:
-    - Overview: protocols/README.md
     - 3DO PBus: protocols/3DO_PBUS.md
     - GameCube Joybus: protocols/GAMECUBE_JOYBUS.md
     - Nuon Polyface: protocols/NUON_POLYFACE.md
     - PC Engine: protocols/PCENGINE.md
+  - Features:
+    - SNES Rumble: features/SNES_RUMBLE.md
 
 markdown_extensions:
   - admonition

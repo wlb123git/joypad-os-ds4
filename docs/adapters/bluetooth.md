@@ -1,6 +1,6 @@
 # BT2USB — Bluetooth to USB Adapter
 
-BT2USB turns a Raspberry Pi Pico W, Pico 2 W, or ESP32-S3 board into a wireless Bluetooth-to-USB controller adapter. Pair any supported Bluetooth controller and it outputs as a standard USB gamepad.
+BT2USB turns a Raspberry Pi Pico W, Pico 2 W, ESP32-S3, or nRF52840 board into a wireless Bluetooth-to-USB controller adapter. Pair any supported Bluetooth controller and it outputs as a standard USB gamepad.
 
 ## Supported Controllers
 
@@ -28,12 +28,22 @@ BT2USB turns a Raspberry Pi Pico W, Pico 2 W, or ESP32-S3 board into a wireless 
 | Switch 2 Pro (BLE) | Supported |
 | Generic BLE HID gamepads | Supported |
 
-Classic BT controllers (DS3, DS4, DS5, Switch Pro, Wii U Pro) are not supported on ESP32-S3. See [ESP32 docs](../ESP32.md) for details.
+### nRF52840 (BLE only)
+
+| Controller | Status |
+|---|---|
+| Xbox One / Series (BLE mode) | Supported |
+| 8BitDo controllers (BLE mode) | Supported |
+| Switch 2 Pro (BLE) | Supported |
+| Generic BLE HID gamepads | Supported |
+
+Classic BT controllers (DS3, DS4, DS5, Switch Pro, Wii U Pro) are not supported on ESP32-S3 or nRF52840. See [ESP32 docs](../platforms/esp32.md) and [nRF52840 docs](../platforms/nrf52840.md) for details.
 
 ## Hardware
 
 - **Pico W / Pico 2 W** — built-in Bluetooth, no dongle needed
-- **ESP32-S3** — built-in BLE, requires ESP-IDF to build ([setup guide](../ESP32.md))
+- **ESP32-S3** — built-in BLE, requires ESP-IDF to build ([setup guide](../platforms/esp32.md))
+- **nRF52840** — built-in BLE, requires nRF Connect SDK to build ([setup guide](../platforms/nrf52840.md))
 
 ## Firmware Files
 
@@ -42,6 +52,8 @@ Classic BT controllers (DS3, DS4, DS5, Switch Pro, Wii U Pro) are not supported 
 | Pico W | `joypad_*_bt2usb_pico_w.uf2` |
 | Pico 2 W | `joypad_*_bt2usb_pico2_w.uf2` |
 | ESP32-S3 | `joypad_*_bt2usb_esp32s3.uf2` (drag-and-drop via TinyUF2) |
+| XIAO nRF52840 | `joypad_*_bt2usb_seeed_xiao_nrf52840.uf2` |
+| Feather nRF52840 | `joypad_*_bt2usb_adafruit_feather_nrf52840.uf2` |
 
 ## Pairing
 

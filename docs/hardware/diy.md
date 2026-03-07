@@ -1,0 +1,70 @@
+# DIY Builds
+
+Everything you need to build your own Joypad adapter.
+
+## General Requirements
+
+1. **Microcontroller board** (see [Supported Boards](boards.md))
+2. **USB cable** (USB-C or Micro-USB, depending on board)
+3. **Console connector** (specific to target console)
+4. **Wires** (22-26 AWG)
+5. **Soldering iron** and solder
+6. **Optional**: Level shifters, resistors, capacitors
+
+## USB Host Port
+
+Most boards need a USB-A connector wired to GPIO pins for controller input. See the [Wiring Guide](wiring.md) for complete pin assignments and diagrams.
+
+**Exception**: The Adafruit Feather RP2040 USB Host has a built-in USB-A port — no wiring needed.
+
+## Console-Specific Pinouts
+
+Each adapter has its own wiring diagram in its documentation:
+
+- [PCEngine Pinout](../adapters/pcengine.md#pin-configuration)
+- [GameCube Pinout](../adapters/gamecube.md#hardware-requirements)
+- [Dreamcast Pinout](../adapters/dreamcast.md#dreamcast-controller-connector-pinout)
+- [Nuon Pinout](../adapters/nuon.md#hardware-requirements)
+- [3DO Pinout](../adapters/3do.md#wiring-diagram)
+- [Neo Geo Pinout](../adapters/neogeo.md#hardware-requirements)
+
+## Common Mistakes
+
+- Reversed power polarity
+- Wrong voltage (5V vs 3.3V)
+- Cold solder joints
+- Crossed data lines (especially D+ and D- on USB host)
+- Missing pullup resistors
+- Incorrect GPIO pin assignments
+- Using a charge-only USB cable (no data lines)
+
+## Where to Buy
+
+### Microcontroller Boards
+
+- [Adafruit](https://www.adafruit.com/) - KB2040, Feather, QT Py
+- [Raspberry Pi](https://www.raspberrypi.com/) - Pico, Pico W
+- [Waveshare](https://www.waveshare.com/) - RP2040-Zero
+- [Seeed Studio](https://www.seeedstudio.com/) - XIAO ESP32-S3, XIAO nRF52840
+- [Pimoroni](https://shop.pimoroni.com/) - Various RP2040 boards
+
+### Pre-Built Adapters
+
+- [Controller Adapter](https://controlleradapter.com/) - Ready-to-use products
+  - USB2PCE
+  - USB2GC (GCUSB)
+  - USB2Nuon (NUONUSB)
+  - USB23DO
+
+### Console Connectors
+
+- **eBay** - Replacement controller cables
+- **AliExpress** - Bulk connectors
+- **Console5** - Retro console parts
+- **Retro Game Cave** - Specialty connectors
+
+## Community Builds
+
+Share your build on Discord: [community.joypad.ai](http://community.joypad.ai/)
+
+See what others have built and get help with your project!

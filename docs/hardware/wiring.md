@@ -1,19 +1,22 @@
-# USB Host Wiring Guide
+# Wiring Guide
 
-How to wire a USB-A host port to your RP2040/RP2350 board for connecting controllers.
+How to wire USB host ports and console connectors to your board.
 
-> **Note:** The Adafruit Feather RP2040 USB Host has a built-in USB-A port — no wiring needed. This guide is for boards that require an external USB-A connector.
+## USB Host Port Wiring
 
-## How It Works
+Most RP2040 boards need a USB-A connector wired to specific GPIO pins for controller input.
 
-Joypad uses PIO-based USB host (bit-banged via the RP2040's PIO1 peripheral). This allows **simultaneous USB host and device** — the native USB port acts as device (for flashing and USB output modes) while PIO USB provides the host port for controllers.
+> **Note:** The Adafruit Feather RP2040 USB Host has a built-in USB-A port — no wiring needed. nRF52840 boards use MAX3421E for USB host instead of PIO-USB.
+
+### How It Works
+
+Joypad uses PIO-based USB host (bit-banged via the RP2040's PIO peripheral). This allows **simultaneous USB host and device** — the native USB port acts as device (for flashing and USB output modes) while PIO USB provides the host port for controllers.
 
 - Full Speed (12 Mbps) only
 - D+ and D- must be on consecutive GPIOs (D- = D+ + 1)
-- PIO1 is used for USB host (PIO0 is reserved for NeoPixel/status LED)
 - **Single device only** — USB hubs are not supported on PIO USB host due to [upstream issues](https://github.com/sekigon-gonnoc/Pico-PIO-USB/issues/149) with enumeration and disconnect detection
 
-## Pin Reference
+### Pin Reference
 
 | Board | D+ | D- | VBUS | Notes |
 |-------|----|----|------|-------|
@@ -24,7 +27,7 @@ Joypad uses PIO-based USB host (bit-banged via the RP2040's PIO1 peripheral). Th
 | Waveshare RP2040-Zero | GPIO 10 | GPIO 11 | 5V | Compact boards |
 | Waveshare RP2350A USB-A | GPIO 12 | GPIO 13 | 5V | Has built-in USB-A port |
 
-## USB-A Connector Pinout
+### USB-A Connector Pinout
 
 ```
   ┌───────────────────┐
@@ -41,11 +44,9 @@ Joypad uses PIO-based USB host (bit-banged via the RP2040's PIO1 peripheral). Th
 | 3 | D+ | Green |
 | 4 | GND | Black |
 
-## Wiring
-
 ### Raspberry Pi Pico / Pico W / Pico 2 W
 
-<img src="images/usb2usb_pico_host.png" alt="Pico USB Host Wiring" width="300">
+<img src="../images/usb2usb_pico_host.png" alt="Pico USB Host Wiring" width="300">
 
 | Pico Pin | USB-A Pin | Signal |
 |----------|-----------|--------|
@@ -65,19 +66,19 @@ Joypad uses PIO-based USB host (bit-banged via the RP2040's PIO1 peripheral). Th
 | 5V | 1 | 5V (red) |
 | GND | 4 | GND (black) |
 
-## What You Need
+### What You Need
 
 - **USB-A female breakout board** ([example](https://www.adafruit.com/product/1833)) or a cut USB-A extension cable
 - **4 jumper wires** (or 22-26 AWG wire + soldering)
 
-## Tips
+### Tips
 
 - **Double-check D+ and D-** — swapping them is the most common mistake and will silently fail
 - **Keep wires short** — USB signal integrity degrades with long runs; under 15cm is ideal
 - **USB-A breakout boards** are easier than cutting cables — labeled pins reduce wiring errors
 - **No hubs** — connect your controller directly to the USB-A port (hubs are not reliable on PIO USB)
 
-## Troubleshooting
+### Troubleshooting
 
 **No controller detected:**
 - Verify D+ and D- are not swapped
@@ -91,4 +92,15 @@ Joypad uses PIO-based USB host (bit-banged via the RP2040's PIO1 peripheral). Th
 - Some controllers draw more current than VBUS can supply — use external 5V power
 
 **Works with some controllers but not others:**
-- Check [HARDWARE.md](HARDWARE.md#supported-usb-input-devices) for the compatibility list
+- Check the [controller compatibility list](controllers.md) for supported devices
+
+## Console Connector Pinouts
+
+Console-specific wiring is documented with each adapter:
+
+- [PCEngine / TurboGrafx-16](../adapters/pcengine.md#pin-configuration) — 8-pin DIN
+- [GameCube / Wii](../adapters/gamecube.md#hardware-requirements) — Controller cable
+- [Dreamcast](../adapters/dreamcast.md#dreamcast-controller-connector-pinout) — Maple bus connector
+- [Nuon](../adapters/nuon.md#hardware-requirements) — Polyface serial
+- [3DO](../adapters/3do.md#wiring-diagram) — DB9 with level shifters
+- [Neo Geo / SuperGun](../adapters/neogeo.md#hardware-requirements) — DB15

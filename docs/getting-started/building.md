@@ -180,7 +180,7 @@ make usb2uart      # USB → UART (ESP32 Bluetooth bridge)
 
 ### ESP32-S3 (BT2USB)
 
-Requires ESP-IDF v6.0+ (separate from the ARM toolchain). See [ESP32 docs](ESP32.md) for full setup.
+Requires ESP-IDF v6.0+ (separate from the ARM toolchain). See [ESP32-S3 docs](../platforms/esp32.md) for full setup.
 
 ```bash
 make bt2usb_esp32s3                 # Build
@@ -188,6 +188,18 @@ make uf2-bt2usb_esp32s3             # Build + generate .uf2
 make flash-uf2-bt2usb_esp32s3       # Build + flash .uf2 via TinyUF2 drive
 make flash-bt2usb_esp32s3           # Build + flash via esptool
 make monitor-bt2usb_esp32s3         # UART serial monitor
+```
+
+### nRF52840 (BT2USB / USB2USB)
+
+Requires nRF Connect SDK v3.1.0+ (separate from the ARM toolchain). See [nRF52840 docs](../platforms/nrf52840.md) for full setup.
+
+```bash
+make init-nrf                                       # One-time NCS setup
+make bt2usb_seeed_xiao_nrf52840                     # Build for XIAO
+make bt2usb_adafruit_feather_nrf52840               # Build for Feather
+make flash-bt2usb_seeed_xiao_nrf52840               # Flash via UF2
+make monitor-bt2usb_seeed_xiao_nrf52840             # UART serial monitor
 ```
 
 ### Build All
@@ -326,7 +338,7 @@ make <target>
 
 ### Controllers not detected
 
-1. Check [HARDWARE.md](HARDWARE.md) for compatibility
+1. Check the [controller compatibility list](../hardware/controllers.md)
 2. Ensure USB hub is powered (if using)
 3. Try direct connection without hub
 
@@ -334,6 +346,6 @@ make <target>
 
 ## Getting Help
 
-- **Docs**: [README.md](../README.md), [HARDWARE.md](HARDWARE.md)
+- **Docs**: [README.md](../README.md), [Hardware Compatibility](../hardware/controllers.md)
 - **Issues**: https://github.com/joypad-ai/joypad-os/issues
 - **Discord**: http://community.joypad.ai/

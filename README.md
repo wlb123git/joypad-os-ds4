@@ -12,91 +12,117 @@
   <img src="https://img.shields.io/github/actions/workflow/status/joypad-ai/joypad-os/.github/workflows/build.yml" />
 </p>
 
-**Universal controller firmware foundation for adapters, controllers, and input systems.**
+**Universal controller firmware for adapters, controllers, and input systems.**
 
-Joypad OS is a modular, high-performance firmware platform for building controller adapters, custom controllers, and input/output bridges across USB, Bluetooth, and native game console protocols.
+Joypad OS translates any input device into any output protocol. Connect USB, Bluetooth, or WiFi controllers to retro consoles, or bridge native retro controllers to USB. It runs on RP2040, ESP32-S3, and nRF52840 microcontrollers.
 
-Formerly known as **USBRetro**, this project now serves as the foundational firmware layer of the **Joypad** ecosystem — a universal platform for extending how controllers work, connect, and evolve.
-
-Joypad OS focuses on real-time controller I/O, protocol translation, and flexible routing, making it easy to build everything from classic console adapters to next-generation, assistive, and AI-augmented input devices.
+Formerly known as **USBRetro**.
 
 ---
 
-## What Joypad OS Enables
+## What Joypad OS Does
 
-- **Universal input/output translation** — Convert USB HID devices into native console protocols and vice versa.
-- **Modular firmware apps** — Build specific bridges like `usb2usb`, `usb2gc`, `snes2usb`, passthrough adapters, merged inputs, and hybrid devices — all on a shared core.
-- **Flexible routing & passthrough** — Support multi-output controllers, input merging, chaining devices, and advanced mods.
-- **Hardware-agnostic foundation** — Designed to run across RP2040 today, with future portability to ESP32 and nRF platforms.
-- **Foundation for accessibility & assistive play** — Enables custom controllers and input extensions for gamers with diverse needs.
-
-Joypad OS is the real-time nervous system of the Joypad platform.
+- **Any input → any output** — USB HID, XInput, Bluetooth (Classic + BLE), WiFi, and native SNES/N64/GameCube controllers as inputs. PCEngine, GameCube, Dreamcast, Nuon, 3DO, Neo Geo, and USB as outputs.
+- **Multi-platform** — Runs on RP2040 (console adapters, USB output), ESP32-S3 (BLE to USB), and nRF52840 (BLE to USB, USB host via MAX3421E).
+- **Flexible routing** — 1:1, merged, or broadcast input-to-output mapping. Multi-player support up to 8 players.
+- **Configurable** — Button remapping profiles, USB output mode switching, web configurator at [config.joypad.ai](https://config.joypad.ai).
 
 ---
 
-## Supported Outputs
+## Supported Adapters
 
-| Output | Features | Documentation |
-|--------|----------|---------------|
-| **USB Device** | HID Gamepad, XInput, Xbox OG, Xbox One, XAC, PS3, PS4, PS Classic, Switch | [Docs](docs/apps/USB2USB.md) |
-| **PCEngine / TurboGrafx-16** | Multitap (5 players), Mouse, 2/3/6-button | [Docs](docs/apps/USB2PCE.md) |
-| **GameCube / Wii** | Profiles, Rumble, Keyboard mode | [Docs](docs/apps/USB2GC.md) |
-| **Sega Dreamcast** | ~~VMU emulation~~, Rumble, Profiles | [Docs](docs/apps/USB2DC.md) |
-| **Nuon DVD Players** | Controller, Spinner (Tempest 3000), IGR | [Docs](docs/apps/USB2NUON.md) |
-| **3DO Interactive Multiplayer** | 8 players, Mouse, Extension passthrough | [Docs](docs/apps/USB23DO.md) |
-| **Neo Geo / SuperGun** | Profiles, 1L6B layouts | [Docs](docs/apps/USB2NEO.md) |
-| **Casio Loopy** | 4 players (experimental) | [Docs](docs/apps/USB2LOOPY.md) |
+### Console Adapters
+
+| Console | Highlights | Documentation |
+|---------|-----------|---------------|
+| **PCEngine / TurboGrafx-16** | Multitap (5 players), mouse, 2/3/6-button | [Docs](docs/adapters/pcengine.md) |
+| **GameCube / Wii** | Profiles, rumble, keyboard mode | [Docs](docs/adapters/gamecube.md) |
+| **Sega Dreamcast** | Rumble, analog triggers, 4 players | [Docs](docs/adapters/dreamcast.md) |
+| **Nuon DVD Players** | Controller, spinner (Tempest 3000), IGR | [Docs](docs/adapters/nuon.md) |
+| **3DO Interactive Multiplayer** | 8 players, mouse, extension passthrough | [Docs](docs/adapters/3do.md) |
+| **Neo Geo / SuperGun** | 7 profiles, 1L6B arcade layouts | [Docs](docs/adapters/neogeo.md) |
+| **Casio Loopy** | 4 players (experimental) | [Docs](docs/adapters/loopy.md) |
+
+### USB & Bluetooth Adapters
+
+| Adapter | Input | Output | Platforms | Documentation |
+|---------|-------|--------|-----------|---------------|
+| **USB2USB** | USB/BT controllers | USB HID gamepad | RP2040, nRF52840 | [Docs](docs/adapters/usb.md) |
+| **BT2USB** | Bluetooth controllers | USB HID gamepad | Pico W, ESP32-S3, nRF52840 | [Docs](docs/adapters/bluetooth.md) |
+| **WiFi2USB** | WiFi controllers (JOCP) | USB HID gamepad | Pico W | [Docs](docs/adapters/usb.md) |
+
+### Native Input Adapters
+
+| Adapter | Input | Output | Documentation |
+|---------|-------|--------|---------------|
+| **SNES2USB** | SNES/NES controller | USB HID gamepad | [Docs](docs/adapters/native-input.md#snes-to-usb-snes2usb) |
+| **N642USB** | N64 controller | USB HID gamepad | [Docs](docs/adapters/native-input.md#n64-to-usb-n642usb) |
+| **GC2USB** | GameCube controller | USB HID gamepad | [Docs](docs/adapters/native-input.md#gamecube-to-usb-gc2usb) |
+| **NEOGEO2USB** | Neo Geo arcade stick | USB HID gamepad | [Docs](docs/adapters/native-input.md#neo-geo-to-usb-neogeo2usb) |
+| **N642DC** | N64 controller | Dreamcast | [Docs](docs/adapters/native-input.md#cross-console-adapters) |
+| **SNES23DO** | SNES controller | 3DO | [Docs](docs/adapters/native-input.md#cross-console-adapters) |
 
 ---
 
 ## Supported Input Devices
 
-**USB Controllers:**
-- Xbox (OG/360/One/Series X|S, 360 Wireless Adapter)
-- PlayStation (Classic/DS3/DS4/DualSense)
-- Nintendo (Switch Pro, Switch 2 Pro, NSO GameCube, GameCube adapter)
-- 8BitDo (PCE 2.4g, M30, BT Adapters)
-- Hori (Horipad, Pokken Tournament)
-- Logitech Wingman
-- Sega Astro City Mini
-- Google Stadia
-- Raphnet adapters (PCEngine, etc.)
-- Generic HID gamepads
+- **Xbox** — OG, 360, One, Series X|S (USB + Bluetooth)
+- **PlayStation** — Classic, DS3, DS4, DualSense (USB + Bluetooth)
+- **Nintendo** — Switch Pro, Switch 2 Pro, Joy-Con, NSO GameCube, GameCube adapter (USB + Bluetooth)
+- **8BitDo** — PCE 2.4g, M30, NeoGeo, BT adapters
+- **Other** — Hori, Logitech, Google Stadia, Sega Astro City, generic HID
+- **Peripherals** — USB keyboards, mice, hubs, Bluetooth dongles
 
-**Bluetooth Controllers (via USB dongle or Pico W):**
-- PlayStation (DS3/DS4/DualSense)
-- Nintendo (Switch Pro, Switch 2 Pro, Wii U Pro, Wiimote)
-- Xbox (One/Series Bluetooth models)
-- Google Stadia
+**[Full controller compatibility list](docs/hardware/controllers.md)**
 
-**Peripherals:**
-- USB Bluetooth dongles (connect BT controllers via USB host)
-- USB Keyboards (full HID support)
-- USB Mice (PCEngine mouse, Nuon spinner, 3DO mouse)
-- USB Hubs (up to 8 devices for 3DO)
+---
 
-**[Complete hardware compatibility list](docs/HARDWARE.md)**
+## How It Works
+
+```
+Input Sources → Router → Output Targets
+
+USB/BT/WiFi/Native controllers are normalized into a common format,
+routed through configurable player slots, and translated into the
+output protocol. Console outputs run on RP2040 Core 1 using PIO
+state machines for cycle-accurate timing.
+```
+
+- **Router** — SIMPLE (1:1), MERGE (all→one), or BROADCAST (all→all) modes
+- **Profiles** — Per-app button remapping, cycled via SELECT + D-pad
+- **Dual-Core** — Core 0 handles input, Core 1 handles timing-critical output (RP2040)
+- **PIO** — Programmable I/O for console protocols (GameCube joybus, Dreamcast maple, etc.)
+
+**[Architecture overview](docs/architecture/overview.md)**
+
+---
+
+## Platforms
+
+| Platform | Chip | Apps | Bluetooth | Build System |
+|----------|------|------|-----------|--------------|
+| **RP2040** | ARM Cortex-M0+ (dual-core) | All console + USB adapters | Classic BT + BLE (Pico W) or via dongle | pico-sdk |
+| **ESP32-S3** | Xtensa LX7 (dual-core) | bt2usb | BLE only | ESP-IDF |
+| **nRF52840** | ARM Cortex-M4 | bt2usb, usb2usb | BLE only | nRF Connect SDK |
 
 ---
 
 ## For Users: Updating Firmware
 
-### Quick Flash
+### Quick Flash (RP2040)
 
 1. **Download** latest `.uf2` from [Releases](https://github.com/joypad-ai/joypad-os/releases)
-2. **Enter bootloader**:
-   - **USB-2-PCE / NUON / 3DO**: Hold BOOT + connect USB-C
-   - **GC USB**: Just connect USB-C (no button)
+2. **Enter bootloader**: Hold BOOT + connect USB-C (or double-tap reset on some boards)
 3. **Drag** `.uf2` file to `RPI-RP2` drive
 4. **Done!** Drive auto-ejects when complete
 
-**[Full installation guide](docs/INSTALLATION.md)**
+**[Full installation guide](docs/getting-started/installation.md)**
 
 ---
 
 ## For Developers: Building Firmware
 
-### Quick Start
+### Quick Start (RP2040)
 
 ```bash
 # Install ARM toolchain (macOS)
@@ -106,82 +132,60 @@ brew install --cask gcc-arm-embedded cmake git
 git clone https://github.com/joypad-ai/joypad-os.git
 cd joypad-os && make init
 
-# Build specific product
-make usb2pce_kb2040   # PCEngine adapter
-make usb2gc_kb2040    # GameCube adapter
-make usb2dc_kb2040    # Dreamcast adapter
-make usb2nuon_kb2040  # Nuon adapter
+# Build specific adapter
+make usb2pce_kb2040     # PCEngine adapter
+make usb2gc_kb2040      # GameCube adapter
+make usb2usb_feather    # USB passthrough
+make bt2usb_pico_w      # Bluetooth to USB (Pico W)
 ```
 
-### Build Commands
+### ESP32-S3
 
 ```bash
-make init          # Initialize submodules (one-time setup)
-make all           # Build all products
-make clean         # Clean build artifacts
-
-# Console adapters (USB/BT input)
-make usb2pce_kb2040       # PCEngine (KB2040)
-make usb2gc_kb2040        # GameCube (KB2040)
-make usb2gc_rp2040zero    # GameCube (RP2040-Zero)
-make usb2dc_kb2040        # Dreamcast (KB2040)
-make usb2nuon_kb2040      # Nuon (KB2040)
-make usb2loopy_kb2040     # Casio Loopy (KB2040)
-make usb23do_rp2040zero   # 3DO (RP2040-Zero)
-
-# Native controller adapters
-make n642dc_kb2040        # N64 → Dreamcast (KB2040)
-make n642usb_kb2040       # N64 → USB (KB2040)
-make snes2usb_kb2040      # SNES → USB (KB2040)
-make snes23do_rp2040zero  # SNES → 3DO (RP2040-Zero)
-
-# USB/BT passthrough
-make usb2usb_feather      # USB → USB (Feather USB Host)
-make usb2usb_rp2040zero   # USB → USB (RP2040-Zero)
-make usb2usb_rp2350usba   # USB → USB (Waveshare RP2350-USB-A)
-make bt2usb_pico_w        # Bluetooth → USB (Pico W)
+make init-esp                   # One-time ESP-IDF setup
+make bt2usb_esp32s3             # Build
+make flash-bt2usb_esp32s3       # Flash
 ```
 
-Output firmware files appear in `releases/` directory.
+### nRF52840
 
-**[Complete build guide](docs/BUILD.md)**
+```bash
+make init-nrf                               # One-time NCS setup
+make bt2usb_seeed_xiao_nrf52840             # Build
+make flash-bt2usb_seeed_xiao_nrf52840       # Flash
+```
+
+Output: `releases/joypad_<commit>_<app>_<board>.uf2`
+
+**[Full build guide](docs/getting-started/building.md)**
 
 ---
 
 ## Documentation
 
-- **[Installation Guide](docs/INSTALLATION.md)** - Flashing firmware, troubleshooting
-- **[Hardware Compatibility](docs/HARDWARE.md)** - Supported controllers, boards, DIY builds
-- **[Build Guide](docs/BUILD.md)** - Developer setup, architecture
+### Getting Started
+- **[Installation Guide](docs/getting-started/installation.md)** — Flashing firmware
+- **[Build Guide](docs/getting-started/building.md)** — Developer setup
 
-### USB Output & Web Config
+### Adapters
+- **[Console Adapters](docs/adapters/pcengine.md)** — PCEngine, GameCube, Dreamcast, Nuon, 3DO, Neo Geo, Loopy
+- **[USB Output](docs/adapters/usb.md)** — USB output modes, web config, Xbox 360 support
+- **[Bluetooth](docs/adapters/bluetooth.md)** — BT2USB wireless adapter
+- **[Native Input](docs/adapters/native-input.md)** — SNES/N64/GC/Neo Geo to USB
 
-- **[USB Output Modes](docs/apps/USB2USB.md)** - Mode switching, Xbox 360 support, web config at [config.joypad.ai](https://config.joypad.ai)
+### Hardware
+- **[Supported Controllers](docs/hardware/controllers.md)** — USB, Bluetooth, keyboards, mice
+- **[Supported Boards](docs/hardware/boards.md)** — RP2040, ESP32-S3, nRF52840 boards
+- **[Wiring Guide](docs/hardware/wiring.md)** — USB host port + console connectors
+- **[DIY Builds](docs/hardware/diy.md)** — Build your own adapter
 
-### Console-Specific Guides
+### Platforms
+- **[ESP32-S3](docs/platforms/esp32.md)** — ESP-IDF setup, TinyUF2, architecture
+- **[nRF52840](docs/platforms/nrf52840.md)** — nRF Connect SDK setup, debugging
 
-- **[GameCube/Wii](docs/apps/USB2GC.md)** - Profiles, keyboard mode, rumble
-- **[PCEngine/TurboGrafx-16](docs/apps/USB2PCE.md)** - Multitap, mouse, button modes
-- **[Sega Dreamcast](docs/apps/USB2DC.md)** - ~~VMU emulation~~, rumble, profiles
-- **[Nuon](docs/apps/USB2NUON.md)** - Controller, Tempest 3000 spinner, IGR
-- **[3DO](docs/apps/USB23DO.md)** - 8-player support, mouse, profiles
-- **[Neo Geo / SuperGun](docs/apps/USB2NEO.md)** - Profiles, arcade layouts
-- **[Casio Loopy](docs/apps/USB2LOOPY.md)** - Experimental support
-
----
-
-## Architecture
-
-Joypad OS uses a modular architecture:
-
-- **RP2040** - Dual-core ARM Cortex-M0+ microcontroller
-- **TinyUSB** - USB host stack for polling USB devices
-- **PIO** - Programmable I/O for timing-critical console protocols
-- **Dual-Core**: Core 0 handles USB input, Core 1 runs console output
-- **Router** - Flexible input→output routing (SIMPLE/MERGE/BROADCAST)
-- **Apps** - Per-product configuration (router, profiles, features)
-
-**See [CLAUDE.md](CLAUDE.md) for detailed architecture**
+### Reference
+- **[Architecture Overview](docs/architecture/overview.md)** — How it works
+- **[Protocol Reference](docs/protocols/)** — 3DO PBus, GameCube Joybus, Nuon Polyface, PCEngine
 
 ---
 
