@@ -42,6 +42,7 @@ nav:
     - 3DO: adapters/3do.md
     - Neo Geo / SuperGun: adapters/neogeo.md
     - Casio Loopy: adapters/loopy.md
+    - N64 (BT2N64): adapters/n64.md
     - USB Output: adapters/usb.md
     - Bluetooth: adapters/bluetooth.md
     - Native Input: adapters/native-input.md

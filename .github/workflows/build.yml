@@ -44,6 +44,8 @@ jobs:
           - usb2usb_rp2350usba
           - bt2usb_pico_w
           - bt2usb_pico2_w
+          - bt2n64_pico_w
+          - bt2n64_pico2_w
           - snes2usb_kb2040
           - n642usb_kb2040
           - nes2usb_pico_w
@@ -249,6 +251,13 @@ jobs:
         with:
           name: joypad_${{ steps.commit.outputs.hash }}_bt2usb
           path: organized/bt2usb/*.uf2
+          if-no-files-found: ignore
+
+      - name: Upload bt2n64
+        uses: actions/upload-artifact@v4
+        with:
+          name: joypad_${{ steps.commit.outputs.hash }}_bt2n64
+          path: organized/bt2n64/*.uf2
           if-no-files-found: ignore
 
       - name: Upload snes2usb

@@ -52,6 +52,7 @@ Joypad OS translates any input device into any output protocol. Connect USB, Blu
 | [**3DO**](adapters/3do.md) | 8-player support, mouse, extension passthrough |
 | [**Neo Geo / SuperGun**](adapters/neogeo.md) | 7 profiles, 1L6B arcade layouts |
 | [**Casio Loopy**](adapters/loopy.md) | 4-player (experimental) |
+| [**N64 (BT2N64)**](adapters/n64.md) | Wireless BT controllers, rumble, profiles |
 
 ---
 

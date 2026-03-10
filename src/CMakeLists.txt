@@ -473,7 +473,7 @@ target_compile_definitions(joypad_n64 PRIVATE CONFIG_N64=1)
 target_sources(joypad_n64 PUBLIC ${COMMON_SOURCES}
     ${CMAKE_CURRENT_SOURCE_DIR}/native/device/n64/n64_device.c
     ${CMAKE_CURRENT_SOURCE_DIR}/lib/joybus-pio/src/joybus.c
-    ${CMAKE_CURRENT_SOURCE_DIR}/lib/joybus-pio/src/N64Console.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/lib/joybus-pio/src/N64Console.c
     ${CMAKE_CURRENT_SOURCE_DIR}/apps/usb2n64/app.c
 )
 target_include_directories(joypad_n64 PUBLIC
@@ -1097,7 +1097,7 @@ if (PICO_BOARD STREQUAL "pico_w" OR PICO_BOARD STREQUAL "pico2_w")
         ${CMAKE_CURRENT_SOURCE_DIR}/bt/transport/bt_transport_cyw43.c
         ${CMAKE_CURRENT_SOURCE_DIR}/native/device/n64/n64_device.c
         ${CMAKE_CURRENT_SOURCE_DIR}/lib/joybus-pio/src/joybus.c
-        ${CMAKE_CURRENT_SOURCE_DIR}/lib/joybus-pio/src/N64Console.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/lib/joybus-pio/src/N64Console.c
         ${CMAKE_CURRENT_SOURCE_DIR}/apps/bt2n64/app.c
     )
     target_include_directories(joypad_bt2n64 PUBLIC
