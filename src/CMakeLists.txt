@@ -405,9 +405,11 @@ pico_generate_pio_header(joypad_pce ${CMAKE_CURRENT_LIST_DIR}/native/device/pcen
 pico_generate_pio_header(joypad_pce ${CMAKE_CURRENT_LIST_DIR}/native/device/pcengine/select.pio)
 
 # --- GameCube (KB2040) ---
+# CDC config mode: when no GC 3.3V detected, boots as USB device with CDC for web config
 add_executable(joypad_ngc)
 target_compile_definitions(joypad_ngc PRIVATE CONFIG_NGC=1 CONFIG_USB_HOST=1)
 target_sources(joypad_ngc PUBLIC ${COMMON_SOURCES}
+    ${USB_DEVICE_SOURCES}
     ${CMAKE_CURRENT_SOURCE_DIR}/native/device/gamecube/gamecube_device.c
     ${CMAKE_CURRENT_SOURCE_DIR}/lib/joybus-pio/src/joybus.c
     ${CMAKE_CURRENT_SOURCE_DIR}/lib/joybus-pio/src/GamecubeConsole.c
@@ -417,8 +419,9 @@ target_include_directories(joypad_ngc PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}/apps/usb2gc
     ${CMAKE_CURRENT_SOURCE_DIR}/native/device/gamecube
     ${CMAKE_CURRENT_SOURCE_DIR}/lib/joybus-pio/include
+    ${CMAKE_CURRENT_SOURCE_DIR}/usb/usbd
 )
-target_link_libraries(joypad_ngc PRIVATE ${COMMON_LIBRARIES} hardware_flash)
+target_link_libraries(joypad_ngc PRIVATE ${COMMON_LIBRARIES} hardware_flash tinyusb_device)
 joypad_target_common(joypad_ngc)
 joypad_add_btstack(joypad_ngc)
 pico_generate_pio_header(joypad_ngc ${CMAKE_CURRENT_LIST_DIR}/lib/joybus-pio/src/joybus.pio)
@@ -426,6 +429,7 @@ pico_generate_pio_header(joypad_ngc ${CMAKE_CURRENT_LIST_DIR}/lib/joybus-pio/src
 # --- GameCube (RP2040-Zero) ---
 # Note: Uses native USB host (not PIO USB) to avoid PIO conflict with joybus
 # Override default I2C pins (6/7) to avoid conflict with GameCube pins (GC_DATA=7, GC_3V3=6)
+# CDC config mode: when no GC 3.3V detected, boots as USB device with CDC for web config
 add_executable(joypad_ngc_rp2040zero)
 target_compile_definitions(joypad_ngc_rp2040zero PRIVATE
     CONFIG_NGC=1 CONFIG_USB_HOST=1
@@ -435,6 +439,7 @@ target_compile_definitions(joypad_ngc_rp2040zero PRIVATE
     PICO_DEFAULT_I2C_SCL_PIN=15
 )
 target_sources(joypad_ngc_rp2040zero PUBLIC ${COMMON_SOURCES}
+    ${USB_DEVICE_SOURCES}
     ${CMAKE_CURRENT_SOURCE_DIR}/native/device/gamecube/gamecube_device.c
     ${CMAKE_CURRENT_SOURCE_DIR}/lib/joybus-pio/src/joybus.c
     ${CMAKE_CURRENT_SOURCE_DIR}/lib/joybus-pio/src/GamecubeConsole.c
@@ -444,8 +449,9 @@ target_include_directories(joypad_ngc_rp2040zero PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}/apps/usb2gc
     ${CMAKE_CURRENT_SOURCE_DIR}/native/device/gamecube
     ${CMAKE_CURRENT_SOURCE_DIR}/lib/joybus-pio/include
+    ${CMAKE_CURRENT_SOURCE_DIR}/usb/usbd
 )
-target_link_libraries(joypad_ngc_rp2040zero PRIVATE ${COMMON_LIBRARIES} hardware_flash)
+target_link_libraries(joypad_ngc_rp2040zero PRIVATE ${COMMON_LIBRARIES} hardware_flash tinyusb_device)
 joypad_target_common(joypad_ngc_rp2040zero)
 joypad_add_btstack(joypad_ngc_rp2040zero)
 pico_generate_pio_header(joypad_ngc_rp2040zero ${CMAKE_CURRENT_LIST_DIR}/lib/joybus-pio/src/joybus.pio)
@@ -669,6 +675,35 @@ target_link_libraries(joypad_n642nuon PRIVATE ${COMMON_LIBRARIES} pico_bit_ops)
 joypad_target_common(joypad_n642nuon)
 # No BTstack - native N64 input only
 pico_generate_pio_header(joypad_n642nuon ${CMAKE_CURRENT_LIST_DIR}/lib/joybus-pio/src/joybus.pio)
+
+# --- N64 to Nuon (Aries64 board) ---
+# Aries64: RP2040 board with N64 data on GPIO11, Nuon polyface on GPIO12/13.
+# GPIO10 is an open-drain driver transistor on the N64 data line (unused by firmware).
+add_executable(joypad_n642nuon_aries64)
+target_compile_definitions(joypad_n642nuon_aries64 PRIVATE
+    CONFIG_N642NUON=1
+    CONFIG_NUON=1
+    CONFIG_NO_NEOPIXEL=1
+    N64_PIN_DATA=11
+    DATAIO_PIN=12
+    BOARD_LED_PIN=25
+)
+target_sources(joypad_n642nuon_aries64 PUBLIC ${COMMON_SOURCES}
+    ${N64_HOST_SOURCES}
+    ${CMAKE_CURRENT_SOURCE_DIR}/native/device/nuon/nuon_device.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/apps/n642nuon/app.c
+)
+target_include_directories(joypad_n642nuon_aries64 PUBLIC
+    ${CMAKE_CURRENT_SOURCE_DIR}/apps/n642nuon
+    ${CMAKE_CURRENT_SOURCE_DIR}/native/host/n64
+    ${CMAKE_CURRENT_SOURCE_DIR}/native/device/nuon
+    ${CMAKE_CURRENT_SOURCE_DIR}/lib/joybus-pio/include
+)
+target_link_libraries(joypad_n642nuon_aries64 PRIVATE ${COMMON_LIBRARIES} pico_bit_ops)
+joypad_target_common(joypad_n642nuon_aries64)
+pico_generate_pio_header(joypad_n642nuon_aries64 ${CMAKE_CURRENT_LIST_DIR}/lib/joybus-pio/src/joybus.pio)
+pico_generate_pio_header(joypad_n642nuon_aries64 ${CMAKE_CURRENT_LIST_DIR}/native/device/nuon/polyface_read.pio)
+pico_generate_pio_header(joypad_n642nuon_aries64 ${CMAKE_CURRENT_LIST_DIR}/native/device/nuon/polyface_send.pio)
 pico_generate_pio_header(joypad_n642nuon ${CMAKE_CURRENT_LIST_DIR}/native/device/nuon/polyface_read.pio)
 pico_generate_pio_header(joypad_n642nuon ${CMAKE_CURRENT_LIST_DIR}/native/device/nuon/polyface_send.pio)
 

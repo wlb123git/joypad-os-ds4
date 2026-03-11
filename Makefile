@@ -72,6 +72,7 @@ CONSOLE_neogeo_rp2040zero := joypad_neogeo_rp2040zero
 CONSOLE_n642dc := joypad_n642dc
 CONSOLE_n642dc_pico2_w := joypad_n642dc_pico2_w
 CONSOLE_n642nuon := joypad_n642nuon
+CONSOLE_n642nuon_aries64 := joypad_n642nuon_aries64
 CONSOLE_snes3do := joypad_snes3do
 CONSOLE_uart := joypad_uart
 CONSOLE_usb_feather_rp2040 := joypad_usb_feather_rp2040
@@ -120,6 +121,7 @@ APP_n642dc_pico2_w := pico2_w n642dc_pico2_w n642dc_pico2_w N64 Dreamcast
 APP_nes2usb_kb2040 := kb2040 nes2usb nes2usb_kb2040 NES USB
 APP_nes2usb_pico_w := pico_w nes2usb nes2usb_pico_w NES USB
 APP_n642nuon_kb2040 := kb2040 n642nuon n642nuon_kb2040 N64 Nuon
+APP_n642nuon_aries64 := pico n642nuon_aries64 n642nuon_aries64 N64 Nuon
 APP_usb23do_rp2040zero := rp2040zero 3do usb23do_rp2040zero USB/BT 3DO
 APP_snes23do_rp2040zero := rp2040zero snes3do snes23do_rp2040zero SNES 3DO
 APP_usb2uart_kb2040 := kb2040 uart usb2uart_kb2040 USB/BT UART
@@ -409,6 +411,10 @@ n642dc_pico2_w:
 .PHONY: n642nuon_kb2040
 n642nuon_kb2040:
 	$(call build_app,n642nuon_kb2040)
+
+.PHONY: n642nuon_aries64
+n642nuon_aries64:
+	$(call build_app,n642nuon_aries64)
 
 .PHONY: usb23do_rp2040zero
 usb23do_rp2040zero:
@@ -1000,6 +1006,10 @@ flash-n642dc_pico2_w:
 flash-n642nuon_kb2040:
 	@$(MAKE) --no-print-directory _flash_app APP_NAME=n642nuon_kb2040
 
+.PHONY: flash-n642nuon_aries64
+flash-n642nuon_aries64:
+	@$(MAKE) --no-print-directory _flash_app APP_NAME=n642nuon_aries64
+
 .PHONY: flash-usb23do_rp2040zero
 flash-usb23do_rp2040zero:
 	@$(MAKE) --no-print-directory _flash_app APP_NAME=usb23do_rp2040zero
@@ -1221,6 +1231,19 @@ fullclean:
 	@echo "$(GREEN)✓ Full clean complete - repository reset to fresh clone state$(NC)"
 	@echo "$(GREEN)  Run 'make init' to initialize submodules and start building$(NC)"
 	@echo ""
+
+# CDC protocol test tool (interactive serial console)
+# Auto-detects USB CDC serial port, or pass PORT= to override
+.PHONY: cdc-test
+cdc-test:
+	@CDC_PORT=$${PORT:-$$(ls /dev/cu.usbmodem* 2>/dev/null | head -1)}; \
+	if [ -z "$$CDC_PORT" ]; then \
+		echo "$(RED)✗ No USB CDC device found$(NC)"; \
+		echo "  Connect a device in CDC mode, or specify: make cdc-test PORT=/dev/cu.usbmodemXXX"; \
+		exit 1; \
+	fi; \
+	echo "$(BLUE)Connecting to $$CDC_PORT...$(NC)"; \
+	python3 tools/cdc_test.py "$$CDC_PORT"
 
 # Show current configuration
 .PHONY: config

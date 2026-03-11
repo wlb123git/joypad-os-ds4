@@ -15,6 +15,7 @@
 #include "core/output_interface.h"
 #include "native/host/n64/n64_host.h"
 #include "native/device/nuon/nuon_device.h"
+#include "platform/platform.h"
 #include <stdio.h>
 
 // ============================================================================
@@ -108,5 +109,5 @@ void app_init(void)
 
 void app_task(void)
 {
-    // Nuon has no rumble feedback - nothing to forward
+    // LED status handled by leds_task() in main loop
 }
