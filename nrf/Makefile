@@ -2,7 +2,8 @@
 #
 # Supported boards: xiao_ble, adafruit_feather_nrf52840
 # Supported apps:   bt2usb (default), usb2usb (with MAX3421E FeatherWing),
-#                   btusb2usb (MAX3421E + Bluetooth combined)
+#                   btusb2usb (MAX3421E + Bluetooth combined),
+#                   controller_btusb (sensor input + BLE peripheral + USB)
 # Requires: nRF Connect SDK v3.1.0 (installed via 'make init')
 # Usage:
 #   make init              # One-time workspace setup
@@ -17,6 +18,12 @@
 
 BOARD ?= xiao_ble
 APP_TYPE ?= bt2usb
+
+# Auto-detect NCS toolchain (adds west, cmake, python3, etc. to PATH)
+NCS_TOOLCHAIN := $(lastword $(wildcard /opt/nordic/ncs/toolchains/*/bin))
+ifneq ($(NCS_TOOLCHAIN),)
+    export PATH := $(NCS_TOOLCHAIN):$(PATH)
+endif
 
 # Build with board-specific overlay and conf if they exist
 OVERLAY := $(wildcard $(shell pwd)/boards/$(BOARD).overlay)
@@ -119,4 +126,4 @@ help:
 	@echo ""
 	@echo "Variables:"
 	@echo "  BOARD        - Target board (default: xiao_ble)"
-	@echo "  APP_TYPE     - App to build: bt2usb (default), usb2usb, or btusb2usb"
+	@echo "  APP_TYPE     - App to build: bt2usb (default), usb2usb, btusb2usb, or controller_btusb"

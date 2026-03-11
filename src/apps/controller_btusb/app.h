@@ -65,6 +65,12 @@
     #define JOYWING_I2C_BUS 1
     #define JOYWING_SDA_PIN 2
     #define JOYWING_SCL_PIN 3
+#elif defined(BOARD_FEATHER_NRF52840)
+    // Adafruit Feather nRF52840: JoyWing on I2C0 (SDA=P0.12, SCL=P0.11)
+    // Pins configured via devicetree; values here for debug prints only
+    #define JOYWING_I2C_BUS 0
+    #define JOYWING_SDA_PIN 12
+    #define JOYWING_SCL_PIN 11
 #elif defined(BOARD_FEATHER_ESP32S3)
     // Adafruit Feather ESP32-S3: I2C on SDA=3, SCL=4
     #define JOYWING_I2C_BUS 0

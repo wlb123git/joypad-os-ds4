@@ -26,6 +26,11 @@ uint32_t platform_time_us(void)
     return (uint32_t)k_ticks_to_us_floor64(k_uptime_ticks());
 }
 
+void platform_sleep_us(uint32_t us)
+{
+    k_busy_wait(us);
+}
+
 void platform_sleep_ms(uint32_t ms)
 {
     k_msleep(ms);

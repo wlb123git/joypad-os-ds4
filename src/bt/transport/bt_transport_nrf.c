@@ -1,16 +1,57 @@
-// bt_transport_nrf.c - Seeed XIAO nRF52840 Bluetooth Transport (Zephyr HCI)
+// bt_transport_nrf.c - nRF52840 Bluetooth Transport (Zephyr HCI)
 // Implements bt_transport_t using BTstack with Zephyr's raw HCI passthrough.
 //
-// This is for the bt2usb app on Seeed XIAO nRF52840 - receives BLE controllers
-// via built-in BLE radio, outputs as USB HID device.
+// Supports two modes:
+//   - Central (bt2usb): scans/connects BLE controllers via btstack_host
+//   - Peripheral (controller_btusb): advertises as BLE gamepad via ble_output
+// Mode is selected via bt_nrf_set_post_init() callback before bt_init().
 //
 // Based on btstack/port/zephyr/src/main.c HCI transport + run loop.
 
 #include "bt_transport.h"
-#include "bt/bthid/bthid.h"
-#include "bt/btstack/btstack_host.h"
 #include <string.h>
 #include <stdio.h>
+
+// ============================================================================
+// POST-INIT CALLBACK (set by app before bt_init)
+// ============================================================================
+
+typedef void (*bt_nrf_post_init_fn)(void);
+static bt_nrf_post_init_fn post_init_callback = NULL;
+
+void bt_nrf_set_post_init(bt_nrf_post_init_fn fn)
+{
+    post_init_callback = fn;
+}
+
+// ============================================================================
+// CENTRAL MODE SUPPORT (bt2usb — btstack_host + bthid)
+// Only linked when btstack_host.c and bthid.c are in the build.
+// ============================================================================
+
+typedef struct {
+    bool active;
+    uint8_t bd_addr[6];
+    char name[48];
+    uint8_t class_of_device[3];
+    uint16_t vendor_id;
+    uint16_t product_id;
+    bool hid_ready;
+    bool is_ble;
+} btstack_classic_conn_info_t;
+
+__attribute__((weak)) void btstack_host_init_hid_handlers(void) {}
+__attribute__((weak)) void btstack_host_process(void) {}
+__attribute__((weak)) void bthid_task(void) {}
+__attribute__((weak)) void btstack_host_power_on(void) {}
+__attribute__((weak)) bool btstack_host_is_powered_on(void) { return false; }
+__attribute__((weak)) void btstack_host_start_scan(void) {}
+__attribute__((weak)) void btstack_host_stop_scan(void) {}
+__attribute__((weak)) bool btstack_host_is_scanning(void) { return false; }
+__attribute__((weak)) uint8_t btstack_classic_get_connection_count(void) { return 0; }
+__attribute__((weak)) bool btstack_classic_get_connection(uint8_t idx, btstack_classic_conn_info_t *info) { (void)idx; (void)info; return false; }
+__attribute__((weak)) bool btstack_classic_send_set_report_type(uint8_t idx, uint8_t type, uint8_t id, const uint8_t *data, uint16_t len) { (void)idx; (void)type; (void)id; (void)data; (void)len; return false; }
+__attribute__((weak)) bool btstack_classic_send_report(uint8_t idx, uint8_t id, const uint8_t *data, uint16_t len) { (void)idx; (void)id; (void)data; (void)len; return false; }
 
 // Zephyr includes
 #include <zephyr/kernel.h>
@@ -328,8 +369,14 @@ static void btstack_thread_entry(void *p1, void *p2, void *p3)
     hci_event_callback_registration.callback = &btstack_event_handler;
     hci_add_event_handler(&hci_event_callback_registration);
 
-    // 5. Register HID host handlers
-    btstack_host_init_hid_handlers();
+    // 5. Post-init: app-provided callback (peripheral) or default HID host (central)
+    if (post_init_callback) {
+        printf("[BT_NRF] Running app post-init callback (peripheral mode)\n");
+        post_init_callback();
+    } else {
+        printf("[BT_NRF] Initializing HID host handlers (central mode)\n");
+        btstack_host_init_hid_handlers();
+    }
 
     // 6. Start periodic process timer
     btstack_run_loop_set_timer_handler(&process_timer, process_timer_handler);
@@ -337,7 +384,13 @@ static void btstack_thread_entry(void *p1, void *p2, void *p3)
     btstack_run_loop_add_timer(&process_timer);
 
     // 7. Power on Bluetooth
-    btstack_host_power_on();
+    if (post_init_callback) {
+        // Peripheral mode: call hci_power_control directly (no btstack_host)
+        printf("[BT_NRF] Powering on BT controller (peripheral mode)\n");
+        hci_power_control(HCI_POWER_ON);
+    } else {
+        btstack_host_power_on();
+    }
 
     nrf_initialized = true;
     printf("[BT_NRF] Entering BTstack run loop\n");
@@ -373,6 +426,11 @@ static void nrf_transport_task(void)
 
 static bool nrf_transport_is_ready(void)
 {
+    // In peripheral mode (post_init_callback set), nrf_initialized is sufficient.
+    // In central mode, also check btstack_host_is_powered_on().
+    if (post_init_callback) {
+        return nrf_initialized;
+    }
     return nrf_initialized && btstack_host_is_powered_on();
 }
 

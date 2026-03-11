@@ -239,6 +239,8 @@ help:
 	@echo "  make flash-usb2usb_feather_nrf52840 - Flash Feather nRF52840 + MAX3421E via UF2"
 	@echo "  make btusb2usb_feather_nrf52840 - USB/BT -> USB HID (Feather nRF52840 + MAX3421E + BLE)"
 	@echo "  make flash-btusb2usb_feather_nrf52840 - Flash Feather nRF52840 btusb2usb via UF2"
+	@echo "  make controller_btusb_feather_nrf52840 - Sensor/BLE -> USB HID (Feather nRF52840 + JoyWing)"
+	@echo "  make flash-controller_btusb_feather_nrf52840 - Flash Feather nRF52840 controller_btusb via UF2"
 	@echo "  make bt2nuon_pico_w     - Bluetooth -> Nuon (Pico W)"
 	@echo "  make bt2n64_pico_w      - Bluetooth -> N64 (Pico W)"
 	@echo "  make wifi2usb_pico_w    - WiFi -> USB HID (Pico W)"
@@ -729,6 +731,26 @@ flash-btusb2usb_feather_nrf52840: btusb2usb_feather_nrf52840
 
 .PHONY: monitor-btusb2usb_feather_nrf52840
 monitor-btusb2usb_feather_nrf52840:
+	@cd nrf && $(MAKE) monitor
+
+# --- nRF52840 controller_btusb on Feather nRF52840 (sensor + BLE peripheral + USB) ---
+.PHONY: controller_btusb_feather_nrf52840
+controller_btusb_feather_nrf52840:
+	@echo "$(YELLOW)Building controller_btusb for Feather nRF52840...$(NC)"
+	@cd nrf && $(MAKE) build BOARD=adafruit_feather_nrf52840 APP_TYPE=controller_btusb
+	@mkdir -p $(RELEASE_DIR)
+	@cp nrf/build/nrf/zephyr/zephyr.uf2 \
+	    $(RELEASE_DIR)/joypad_$(VERSION_ID)_controller_btusb_feather_nrf52840.uf2
+	@echo "$(GREEN)✓ controller_btusb_feather_nrf52840 built successfully$(NC)"
+	@echo "  File: $(RELEASE_DIR)/joypad_$(VERSION_ID)_controller_btusb_feather_nrf52840.uf2"
+	@echo ""
+
+.PHONY: flash-controller_btusb_feather_nrf52840
+flash-controller_btusb_feather_nrf52840: controller_btusb_feather_nrf52840
+	@cd nrf && $(MAKE) flash-uf2
+
+.PHONY: monitor-controller_btusb_feather_nrf52840
+monitor-controller_btusb_feather_nrf52840:
 	@cd nrf && $(MAKE) monitor
 
 .PHONY: wifi2usb_pico_w

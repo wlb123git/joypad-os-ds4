@@ -15,7 +15,9 @@ find_package(Zephyr REQUIRED HINTS $ENV{ZEPHYR_BASE})
 # APP_TYPE selects which app to build (default: bt2usb)
 # Zephyr sysbuild doesn't forward custom -D variables to the inner project,
 # so we detect app type from EXTRA_CONF_FILE (which IS forwarded via sysbuild cache).
-if(DEFINED EXTRA_CONF_FILE AND EXTRA_CONF_FILE MATCHES "prj_btusb2usb")
+if(DEFINED EXTRA_CONF_FILE AND EXTRA_CONF_FILE MATCHES "prj_controller_btusb")
+    set(APP_TYPE "controller_btusb")
+elseif(DEFINED EXTRA_CONF_FILE AND EXTRA_CONF_FILE MATCHES "prj_btusb2usb")
     set(APP_TYPE "btusb2usb")
 elseif(DEFINED EXTRA_CONF_FILE AND EXTRA_CONF_FILE MATCHES "prj_usb2usb")
     set(APP_TYPE "usb2usb")
@@ -350,6 +352,121 @@ elseif(APP_TYPE STREQUAL "btusb2usb")
         CFG_TUSB_CONFIG_FILE="tusb_config_nrf.h"
     )
 
+elseif(APP_TYPE STREQUAL "controller_btusb")
+    # -----------------------------------------------------------------------
+    # controller_btusb: Sensor inputs → BLE Peripheral + USB Device
+    # BTstack BLE peripheral (HOGP), no USB host, no btstack_host/bthid
+    # -----------------------------------------------------------------------
+    list(APPEND SRCS
+        # --- App ---
+        "src/stubs_peripheral.c"
+        "${SHARED_SRC}/apps/controller_btusb/app.c"
+
+        # --- Sensor drivers ---
+        "${SHARED_SRC}/drivers/seesaw/seesaw.c"
+        "${SHARED_SRC}/drivers/joywing/joywing_input.c"
+        "${SHARED_SRC}/platform/nrf/platform_i2c_nrf.c"
+
+        # --- BLE output (peripheral mode) ---
+        "${SHARED_SRC}/bt/ble_output/ble_output.c"
+        "${SHARED_SRC}/bt/ble_output/ble_output_keyboard.c"
+        "${SHARED_SRC}/bt/ble_output/ble_output_mouse.c"
+        "${SHARED_SRC}/bt/ble_output/ble_output_xbox.c"
+        "${SHARED_SRC}/bt/ble_output/ble_nus.c"
+        "${SHARED_SRC}/bt/ble_output/ble_xbox_gatt_db.c"
+
+        # --- BT transport (peripheral mode — no btstack_host, no bthid) ---
+        "${SHARED_SRC}/bt/transport/bt_transport.c"
+        "${SHARED_SRC}/bt/transport/bt_transport_nrf.c"
+
+        # --- nRF BTstack TLV ---
+        "src/btstack_tlv_nrf.c"
+
+        # --- BTstack core ---
+        "${BTSTACK_PATH}/src/btstack_linked_list.c"
+        "${BTSTACK_PATH}/src/btstack_memory.c"
+        "${BTSTACK_PATH}/src/btstack_memory_pool.c"
+        "${BTSTACK_PATH}/src/btstack_run_loop.c"
+        "${BTSTACK_PATH}/src/btstack_run_loop_base.c"
+        "${BTSTACK_PATH}/src/btstack_util.c"
+        "${BTSTACK_PATH}/src/btstack_tlv.c"
+        "${BTSTACK_PATH}/src/btstack_tlv_none.c"
+        "${BTSTACK_PATH}/src/btstack_crypto.c"
+        "${BTSTACK_PATH}/src/btstack_ring_buffer.c"
+        "${BTSTACK_PATH}/src/hci.c"
+        "${BTSTACK_PATH}/src/hci_cmd.c"
+        "${BTSTACK_PATH}/src/hci_dump.c"
+        "${BTSTACK_PATH}/src/hci_event.c"
+        "${BTSTACK_PATH}/src/hci_event_builder.c"
+        "${BTSTACK_PATH}/src/l2cap.c"
+        "${BTSTACK_PATH}/src/l2cap_signaling.c"
+        "${BTSTACK_PATH}/src/ad_parser.c"
+
+        # --- BTstack BLE ---
+        "${BTSTACK_PATH}/src/ble/sm.c"
+        "${BTSTACK_PATH}/src/ble/att_dispatch.c"
+        "${BTSTACK_PATH}/src/ble/att_db.c"
+        "${BTSTACK_PATH}/src/ble/gatt_client.c"
+        "${BTSTACK_PATH}/src/ble/gatt_service_client.c"
+        "${BTSTACK_PATH}/src/ble/le_device_db_memory.c"
+        "${BTSTACK_PATH}/src/ble/le_device_db_tlv.c"
+
+        # --- BTstack GATT server (peripheral mode) ---
+        "${BTSTACK_PATH}/src/ble/att_server.c"
+        "${BTSTACK_PATH}/src/ble/gatt-service/hids_device.c"
+        "${BTSTACK_PATH}/src/ble/gatt-service/battery_service_server.c"
+        "${BTSTACK_PATH}/src/ble/gatt-service/device_information_service_server.c"
+        "${BTSTACK_PATH}/src/ble/gatt-service/nordic_spp_service_server.c"
+        "${BTSTACK_PATH}/src/btstack_hid_parser.c"
+
+        # --- BTstack Classic (compiles but dead code on BLE-only boards) ---
+        "${BTSTACK_PATH}/src/classic/sdp_client.c"
+        "${BTSTACK_PATH}/src/classic/sdp_server.c"
+        "${BTSTACK_PATH}/src/classic/sdp_util.c"
+        "${BTSTACK_PATH}/src/classic/device_id_server.c"
+        "${BTSTACK_PATH}/src/classic/hid_host.c"
+        "${BTSTACK_PATH}/src/classic/btstack_link_key_db_memory.c"
+        "${BTSTACK_PATH}/src/classic/btstack_link_key_db_tlv.c"
+
+        # --- BTstack 3rd-party ---
+        "${BTSTACK_PATH}/3rd-party/micro-ecc/uECC.c"
+        "${BTSTACK_PATH}/3rd-party/rijndael/rijndael.c"
+
+        # --- BTstack platform: embedded + Zephyr chipset ---
+        "${BTSTACK_PATH}/platform/embedded/hci_dump_embedded_stdout.c"
+        "${BTSTACK_PATH}/chipset/zephyr/btstack_chipset_zephyr.c"
+    )
+
+    list(APPEND INCLUDE_DIRS
+        "${SHARED_SRC}/apps/controller_btusb"
+        "${SHARED_SRC}/drivers"
+        "${SHARED_SRC}/bt"
+        "${SHARED_SRC}/bt/btstack"
+        "${SHARED_SRC}/bt/bthid"
+        "${SHARED_SRC}/bt/ble_output"
+        # BTstack includes
+        "${BTSTACK_PATH}/src"
+        "${BTSTACK_PATH}/src/ble"
+        "${BTSTACK_PATH}/platform/embedded"
+        "${BTSTACK_PATH}/3rd-party/micro-ecc"
+        "${BTSTACK_PATH}/3rd-party/rijndael"
+        "${BTSTACK_PATH}/chipset/zephyr"
+    )
+
+    target_compile_definitions(app PRIVATE
+        CONFIG_CONTROLLER_BTUSB=1
+        CONFIG_USB=1
+        DISABLE_USB_HOST=1
+        BTSTACK_USE_NRF=1
+        ENABLE_BTSTACK=1
+        REQUIRE_BLE_OUTPUT=1
+        SENSOR_JOYWING=1
+        PLATFORM_NRF=1
+        DISABLE_DISPLAY_SPI=1
+        OLED_I2C_DISPLAY=1
+        CFG_TUSB_CONFIG_FILE="tusb_config_nrf.h"
+    )
+
 else()
     # -----------------------------------------------------------------------
     # bt2usb (default): Bluetooth → USB Device
@@ -470,6 +587,41 @@ target_sources(app PRIVATE ${SRCS})
 target_include_directories(app PRIVATE ${INCLUDE_DIRS})
 
 # ============================================================================
+# GATT header generation (peripheral mode — controller_btusb)
+# ============================================================================
+
+if(APP_TYPE STREQUAL "controller_btusb")
+    set(COMPILE_GATT "${BTSTACK_PATH}/tool/compile_gatt.py")
+
+    add_custom_command(
+        OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/ble_gamepad.h"
+        COMMAND python3 ${COMPILE_GATT}
+            "${SHARED_SRC}/bt/ble_output/ble_gamepad.gatt"
+            "${CMAKE_CURRENT_BINARY_DIR}/ble_gamepad.h"
+        DEPENDS "${SHARED_SRC}/bt/ble_output/ble_gamepad.gatt"
+        COMMENT "Generating ble_gamepad.h from GATT definition"
+    )
+
+    add_custom_command(
+        OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/ble_xbox.h"
+        COMMAND python3 ${COMPILE_GATT}
+            "${SHARED_SRC}/bt/ble_output/ble_xbox.gatt"
+            "${CMAKE_CURRENT_BINARY_DIR}/ble_xbox.h"
+        DEPENDS "${SHARED_SRC}/bt/ble_output/ble_xbox.gatt"
+        COMMENT "Generating ble_xbox.h from GATT definition"
+    )
+
+    add_custom_target(gatt_headers DEPENDS
+        "${CMAKE_CURRENT_BINARY_DIR}/ble_gamepad.h"
+        "${CMAKE_CURRENT_BINARY_DIR}/ble_xbox.h"
+    )
+    add_dependencies(app gatt_headers)
+
+    # Include build dir for generated GATT headers
+    target_include_directories(app PRIVATE "${CMAKE_CURRENT_BINARY_DIR}")
+endif()
+
+# ============================================================================
 # Version and build info
 # ============================================================================
 
@@ -511,3 +663,9 @@ target_compile_definitions(app PRIVATE
 
 # Disable -Werror for cross-compiled shared code
 target_compile_options(app PRIVATE -Wno-error)
+
+# Force-include btstack_config.h so all BTstack headers see ENABLE_BLE etc.
+# BTstack headers check #ifdef ENABLE_BLE but don't include btstack_config.h themselves.
+if(APP_TYPE STREQUAL "controller_btusb" OR APP_TYPE STREQUAL "bt2usb" OR APP_TYPE STREQUAL "btusb2usb")
+    target_compile_options(app PRIVATE -include btstack_config.h)
+endif()

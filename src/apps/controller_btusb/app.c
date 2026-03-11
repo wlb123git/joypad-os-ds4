@@ -22,12 +22,19 @@
 #include "bt/ble_output/ble_output.h"
 #include "bt/transport/bt_transport.h"
 
+#ifdef BTSTACK_USE_ESP32
 // ESP32 BLE transport
 extern const bt_transport_t bt_transport_esp32;
-
-// Post-init callback setter (declared in bt_transport_esp32.c)
 typedef void (*bt_esp32_post_init_fn)(void);
 extern void bt_esp32_set_post_init(bt_esp32_post_init_fn fn);
+#endif
+
+#ifdef BTSTACK_USE_NRF
+// nRF52840 BLE transport
+extern const bt_transport_t bt_transport_nrf;
+typedef void (*bt_nrf_post_init_fn)(void);
+extern void bt_nrf_set_post_init(bt_nrf_post_init_fn fn);
+#endif
 
 // BTstack APIs for bond management (available after ble_output_late_init)
 extern void gap_delete_all_link_keys(void);
@@ -42,7 +49,7 @@ extern void le_device_db_remove(int index);
 #endif
 
 // OLED display + Joy animation (conditional)
-#ifdef OLED_I2C_INST
+#if defined(OLED_I2C_INST) || defined(OLED_I2C_DISPLAY)
 #include "core/services/display/display.h"
 #include "core/services/display/joy_anim.h"
 #endif
@@ -209,29 +216,50 @@ void app_init(void)
 
 #if REQUIRE_BLE_OUTPUT
     // Load BLE output mode from flash BEFORE starting BTstack task.
-    // The BTstack FreeRTOS task calls ble_output_late_init() asynchronously,
+    // The BTstack task calls ble_output_late_init() asynchronously,
     // which needs current_mode to already be set from flash settings.
     // (main.c output init loop will call this again — harmless double-init.)
     ble_output_init();
 
-    // Initialize ESP32 BLE transport in peripheral mode.
+    // Initialize BLE transport in peripheral mode.
     // Set post-init callback so ble_output_late_init() runs in the BTstack task context.
+#ifdef BTSTACK_USE_ESP32
     bt_esp32_set_post_init(ble_output_late_init);
     bt_init(&bt_transport_esp32);
+#elif defined(BTSTACK_USE_NRF)
+    bt_nrf_set_post_init(ble_output_late_init);
+    bt_init(&bt_transport_nrf);
+#endif
 #endif
 
 #ifdef OLED_I2C_INST
-    // Initialize OLED display
-    display_i2c_config_t oled_cfg = {
-        .i2c_inst = OLED_I2C_INST,
-        .pin_sda = OLED_I2C_SDA_PIN,
-        .pin_scl = OLED_I2C_SCL_PIN,
-        .addr = OLED_I2C_ADDR,
-    };
-    display_init_i2c(&oled_cfg);
+    // Initialize OLED display (RP2040 — explicit I2C config)
+    {
+        display_i2c_config_t oled_cfg = {
+            .i2c_inst = OLED_I2C_INST,
+            .pin_sda = OLED_I2C_SDA_PIN,
+            .pin_scl = OLED_I2C_SCL_PIN,
+            .addr = OLED_I2C_ADDR,
+        };
+        display_init_i2c(&oled_cfg);
+    }
     joy_anim_init();
     joy_anim_event(JOY_EVENT_BOOT);
     printf("[app:controller_btusb] OLED + Joy animation initialized\n");
+#elif defined(OLED_I2C_DISPLAY)
+    // Initialize OLED display (nRF — I2C configured via devicetree)
+    {
+        display_i2c_config_t oled_cfg = {
+            .i2c_inst = 0,
+            .pin_sda = 0,
+            .pin_scl = 0,
+            .addr = 0x3C,
+        };
+        display_init_i2c(&oled_cfg);
+    }
+    joy_anim_init();
+    joy_anim_event(JOY_EVENT_BOOT);
+    printf("[app:controller_btusb] OLED + Joy animation initialized (I2C)\n");
 #endif
 
     printf("[app:controller_btusb] Initialization complete\n");
@@ -303,7 +331,7 @@ void app_task(void)
     }
 #endif
 
-#ifdef OLED_I2C_INST
+#if defined(OLED_I2C_INST) || defined(OLED_I2C_DISPLAY)
     // Joy animation: feed input events from JoyWing → Joy
     {
         static uint32_t last_buttons = 0;
@@ -351,8 +379,9 @@ void app_task(void)
 
         // Tick + render
         if (joy_anim_tick(now)) {
+            display_clear();
             joy_anim_render();
-            display_flush();
+            display_update();
         }
     }
 #endif
