@@ -17,12 +17,12 @@
 // USB IDENTIFIERS
 // ============================================================================
 
-// Using Razer Panthera - known PS4-compatible fightstick
-#define PS4_VID             0x1532  // Razer
-#define PS4_PID             0x0401  // Panthera
+// Using Hori Fighting Commander for better Gamepad compatibility
+#define PS4_VID             0x0F0D  // Hori
+#define PS4_PID             0x0086  // Fighting Commander
 #define PS4_BCD             0x0100  // v1.00
-#define PS4_MANUFACTURER    "Razer"
-#define PS4_PRODUCT         "Panthera"
+#define PS4_MANUFACTURER    "HORI CO., LTD."
+#define PS4_PRODUCT         "Fighting Commander"
 
 #define PS4_ENDPOINT_SIZE   64
 
